@@ -1,11 +1,9 @@
 import pandas as pd
 import streamlit as st
 import joblib
+import os
 
 # Load model
-import os
-import joblib
-
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, "bank_customer_churn_model.pkl")
 
@@ -23,7 +21,6 @@ st.title("🏦 Bank Customer Churn Prediction")
 st.markdown(
     "Predict whether a customer is likely to **leave the bank** based on their profile."
 )
-# st.divider()
 
 # Sidebar for inputs
 st.sidebar.header("🧾 Customer Details")
@@ -71,7 +68,9 @@ estimated_salary = st.sidebar.number_input(
 credit_card = 1 if credit_card == "Yes" else 0
 active_member = 1 if active_member == "Yes" else 0
 
-# Prepare input dataframe
+# Prepare input dataframe - FIXED COLUMN NAMES (use exact names from training)
+# Common column name patterns in bank churn datasets:
+# Try these column names (match your training data exactly):
 input_data = pd.DataFrame(
     [[
         credit_score, country, gender, age, tenure,
@@ -79,9 +78,9 @@ input_data = pd.DataFrame(
         active_member, estimated_salary
     ]],
     columns=[
-        "credit_score", "country", "gender", "age", "tenure",
-        "balance", "products_number", "credit_card",
-        "active_member", "estimated_salary"
+        "CreditScore", "Geography", "Gender", "Age", "Tenure",
+        "Balance", "NumOfProducts", "HasCrCard",
+        "IsActiveMember", "EstimatedSalary"
     ]
 )
 
@@ -90,9 +89,16 @@ st.divider()
 st.subheader("📊 Prediction Result")
 
 if st.button("🔮 Predict Churn", use_container_width=True):
-    prediction = model.predict(input_data)
-
-    if prediction[0] == 1:
-        st.error("⚠️ Customer is **likely to churn**")
-    else:
-        st.success("✅ Customer is **unlikely to churn**")
+    try:
+        prediction = model.predict(input_data)
+        
+        if prediction[0] == 1:
+            st.error("⚠️ Customer is **likely to churn**")
+        else:
+            st.success("✅ Customer is **unlikely to churn**")
+    except Exception as e:
+        st.error(f"Error making prediction: {str(e)}")
+        st.info("Debug information:")
+        st.write("Input data columns:", input_data.columns.tolist())
+        st.write("Input data shape:", input_data.shape)
+        st.write("Input data:", input_data)
