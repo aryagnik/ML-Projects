@@ -1,5 +1,4 @@
 __pycache__/
 .ipynb_checkpoints/
-*.joblib
 .env
 venv/
