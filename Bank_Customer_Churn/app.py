@@ -3,7 +3,13 @@ import streamlit as st
 import joblib
 
 # Load model
-model = joblib.load("bank_customer_churn_model.pkl")
+import os
+import joblib
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "bank_customer_churn_model.pkl")
+
+model = joblib.load(MODEL_PATH)
 
 # Page config
 st.set_page_config(
